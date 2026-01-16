@@ -11,7 +11,7 @@
             --dot-empty: #333333;
             --dot-filled: #4caf50;
             --dot-today: #ffffff;
-            --dot-size: 20px; /* Slightly smaller to fit week labels */
+            --dot-size: 20px;
             --gap-size: 10px;
         }
 
@@ -26,6 +26,7 @@
             min-height: 100vh;
             margin: 0;
             padding: 20px;
+            padding-bottom: 60px; /* Extra padding for the fixed footer */
         }
 
         h1 {
@@ -45,21 +46,18 @@
         /* The Grid Container */
         .tracker-grid {
             display: grid;
-            /* First column: auto-sized for "W1", "W2" labels. 
-               Next 7 columns: equal size for the dots.
-            */
             grid-template-columns: max-content repeat(7, 1fr);
             gap: var(--gap-size);
-            align-items: center; /* Vertically center labels with dots */
+            align-items: center;
             max-width: 500px;
         }
 
-        /* Week Labels (W1, W2...) */
+        /* Week Labels */
         .week-label {
             color: #666;
             font-size: 0.75rem;
             font-weight: bold;
-            padding-right: 15px; /* Space between label and first dot */
+            padding-right: 15px;
             text-align: right;
             user-select: none;
         }
@@ -117,12 +115,47 @@
         .legend-item { display: flex; align-items: center; gap: 8px; }
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
+        /* Settings Panel (Bottom Right) */
+        .settings-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #2a2a2a;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #444;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            opacity: 0.3; /* Subtle by default */
+            transition: opacity 0.3s ease;
+        }
+        .settings-panel:hover {
+            opacity: 1; /* Fully visible on hover */
+        }
+        
+        .settings-label {
+            font-size: 0.8rem;
+            color: #aaa;
+        }
+
+        input[type="date"] {
+            background: #333;
+            border: 1px solid #555;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-family: inherit;
+            cursor: pointer;
+        }
+
     </style>
 </head>
 <body>
 
-    <h1>Deadline Target Tracker</h1>
-    <p class="subtitle">January 16, 2026 — May 16, 2026</p>
+    <h1 id="main-title">Deadline Target Tracker</h1>
+    <p class="subtitle" id="date-range-text">Loading...</p>
 
     <div class="tracker-grid" id="grid">
         </div>
@@ -139,27 +172,50 @@
         </div>
     </div>
 
-    <script>
-        // Configuration
-        const START_DATE = new Date('2026-01-16T00:00:00');
-        const END_DATE = new Date('2026-05-16T00:00:00');
-        const gridContainer = document.getElementById('grid');
+    <div class="settings-panel">
+        <span class="settings-label">Target Date:</span>
+        <input type="date" id="deadline-picker">
+    </div>
 
+    <script>
+        // Constants
+        const START_DATE = new Date('2026-01-16T00:00:00');
+        const DEFAULT_END_DATE = '2026-05-16'; // String format for easy parsing
+        
+        // DOM Elements
+        const gridContainer = document.getElementById('grid');
+        const dateRangeText = document.getElementById('date-range-text');
+        const deadlinePicker = document.getElementById('deadline-picker');
+
+        // Helper: Normalize date to midnight
         function normalizeDate(date) {
             const d = new Date(date);
             d.setHours(0, 0, 0, 0);
             return d;
         }
 
-        function generateTracker() {
+        // Helper: Format Date for Display
+        function formatDateReadable(date) {
+            return date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+        }
+
+        // Main Function: Generate the Grid
+        function generateTracker(targetDateString) {
+            // Clear existing grid
+            gridContainer.innerHTML = '';
+            
+            const endDate = new Date(targetDateString + 'T00:00:00');
             const today = normalizeDate(new Date());
             let currentDate = new Date(START_DATE);
-            let dayCounter = 0; // Tracks total days to determine when to add a new row label
+            let dayCounter = 0;
 
-            // Loop until we reach the end date
-            while (currentDate <= END_DATE) {
+            // Update Subtitle Text
+            dateRangeText.innerText = `${formatDateReadable(START_DATE)} — ${formatDateReadable(endDate)}`;
+
+            // Loop
+            while (currentDate <= endDate) {
                 
-                // 1. Add Week Label at the start of every 7th day (0, 7, 14...)
+                // 1. Add Week Label
                 if (dayCounter % 7 === 0) {
                     const weekNum = (dayCounter / 7) + 1;
                     const weekLabel = document.createElement('div');
@@ -168,11 +224,10 @@
                     gridContainer.appendChild(weekLabel);
                 }
 
-                // 2. Create the Dot
+                // 2. Create Dot
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
                 
-                // Format date for tooltip
                 const dateString = currentDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
                 dot.setAttribute('data-date', dateString);
 
@@ -192,7 +247,30 @@
             }
         }
 
-        generateTracker();
+        // --- Initialization & Event Listeners ---
+
+        // 1. Load preference from LocalStorage or use default
+        const savedDate = localStorage.getItem('tracker_deadline');
+        const initialDate = savedDate || DEFAULT_END_DATE;
+
+        // 2. Set the input value
+        deadlinePicker.value = initialDate;
+        deadlinePicker.min = '2026-01-17'; // Prevent picking dates before start date
+
+        // 3. Initial Render
+        generateTracker(initialDate);
+
+        // 4. Handle User Change
+        deadlinePicker.addEventListener('change', (e) => {
+            const newDate = e.target.value;
+            if (newDate) {
+                // Update Grid
+                generateTracker(newDate);
+                // Save to browser memory
+                localStorage.setItem('tracker_deadline', newDate);
+            }
+        });
+
     </script>
 </body>
 </html>

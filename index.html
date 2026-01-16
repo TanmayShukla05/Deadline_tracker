@@ -9,10 +9,10 @@
             --bg-color: #1a1a1a;
             --text-color: #ffffff;
             --dot-empty: #333333;
-            --dot-filled: #4caf50; /* Green for passed days */
-            --dot-today: #ffffff;  /* White pulse for today */
-            --dot-size: 24px;
-            --gap-size: 12px;
+            --dot-filled: #4caf50;
+            --dot-today: #ffffff;
+            --dot-size: 20px; /* Slightly smaller to fit week labels */
+            --gap-size: 10px;
         }
 
         body {
@@ -29,7 +29,7 @@
         }
 
         h1 {
-            margin-bottom: 10px;
+            margin-bottom: 5px;
             font-size: 1.5rem;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -37,7 +37,7 @@
 
         p.subtitle {
             margin-top: 0;
-            margin-bottom: 30px;
+            margin-bottom: 40px;
             color: #888;
             font-size: 0.9rem;
         }
@@ -45,9 +45,23 @@
         /* The Grid Container */
         .tracker-grid {
             display: grid;
-            grid-template-columns: repeat(7, 1fr); /* Strictly 7 columns */
+            /* First column: auto-sized for "W1", "W2" labels. 
+               Next 7 columns: equal size for the dots.
+            */
+            grid-template-columns: max-content repeat(7, 1fr);
             gap: var(--gap-size);
-            max-width: 400px;
+            align-items: center; /* Vertically center labels with dots */
+            max-width: 500px;
+        }
+
+        /* Week Labels (W1, W2...) */
+        .week-label {
+            color: #666;
+            font-size: 0.75rem;
+            font-weight: bold;
+            padding-right: 15px; /* Space between label and first dot */
+            text-align: right;
+            user-select: none;
         }
 
         /* The Dot Styling */
@@ -58,13 +72,14 @@
             border-radius: 50%;
             transition: all 0.3s ease;
             position: relative;
+            cursor: pointer;
         }
 
-        /* Tooltip on hover to show date */
+        /* Tooltip */
         .dot:hover::after {
             content: attr(data-date);
             position: absolute;
-            bottom: 120%;
+            bottom: 130%;
             left: 50%;
             transform: translateX(-50%);
             background: #000;
@@ -74,6 +89,8 @@
             font-size: 0.75rem;
             white-space: nowrap;
             pointer-events: none;
+            z-index: 10;
+            border: 1px solid #333;
         }
 
         /* States */
@@ -85,12 +102,13 @@
         .dot.today {
             background-color: var(--dot-today);
             box-shadow: 0 0 10px var(--dot-today);
-            transform: scale(1.1);
+            transform: scale(1.2);
+            z-index: 2;
         }
 
         /* Legend */
         .legend {
-            margin-top: 30px;
+            margin-top: 40px;
             display: flex;
             gap: 20px;
             font-size: 0.8rem;
@@ -127,41 +145,50 @@
         const END_DATE = new Date('2026-05-16T00:00:00');
         const gridContainer = document.getElementById('grid');
 
-        // Helper: Normalize a date to midnight to ensure accurate day comparison
         function normalizeDate(date) {
             const d = new Date(date);
             d.setHours(0, 0, 0, 0);
             return d;
         }
 
-        // Generate Dots
         function generateTracker() {
             const today = normalizeDate(new Date());
             let currentDate = new Date(START_DATE);
-            
+            let dayCounter = 0; // Tracks total days to determine when to add a new row label
+
             // Loop until we reach the end date
             while (currentDate <= END_DATE) {
+                
+                // 1. Add Week Label at the start of every 7th day (0, 7, 14...)
+                if (dayCounter % 7 === 0) {
+                    const weekNum = (dayCounter / 7) + 1;
+                    const weekLabel = document.createElement('div');
+                    weekLabel.classList.add('week-label');
+                    weekLabel.innerText = 'W' + weekNum;
+                    gridContainer.appendChild(weekLabel);
+                }
+
+                // 2. Create the Dot
                 const dot = document.createElement('div');
                 dot.classList.add('dot');
                 
                 // Format date for tooltip
-                const dateString = currentDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                const dateString = currentDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
                 dot.setAttribute('data-date', dateString);
 
                 const normalizedCurrent = normalizeDate(currentDate);
 
                 if (normalizedCurrent < today) {
-                    // Day has strictly passed
                     dot.classList.add('filled');
                 } else if (normalizedCurrent.getTime() === today.getTime()) {
-                    // It is exactly today
                     dot.classList.add('today');
                 }
                 
                 gridContainer.appendChild(dot);
 
-                // Increment day by 1
+                // 3. Increment
                 currentDate.setDate(currentDate.getDate() + 1);
+                dayCounter++;
             }
         }
 

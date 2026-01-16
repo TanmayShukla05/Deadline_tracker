@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deadline Target Tracker</title>
+    <style>
+        :root {
+            --bg-color: #1a1a1a;
+            --text-color: #ffffff;
+            --dot-empty: #333333;
+            --dot-filled: #4caf50; /* Green for passed days */
+            --dot-today: #ffffff;  /* White pulse for today */
+            --dot-size: 24px;
+            --gap-size: 12px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        p.subtitle {
+            margin-top: 0;
+            margin-bottom: 30px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        /* The Grid Container */
+        .tracker-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr); /* Strictly 7 columns */
+            gap: var(--gap-size);
+            max-width: 400px;
+        }
+
+        /* The Dot Styling */
+        .dot {
+            width: var(--dot-size);
+            height: var(--dot-size);
+            background-color: var(--dot-empty);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        /* Tooltip on hover to show date */
+        .dot:hover::after {
+            content: attr(data-date);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #000;
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            white-space: nowrap;
+            pointer-events: none;
+        }
+
+        /* States */
+        .dot.filled {
+            background-color: var(--dot-filled);
+            box-shadow: 0 0 5px var(--dot-filled);
+        }
+
+        .dot.today {
+            background-color: var(--dot-today);
+            box-shadow: 0 0 10px var(--dot-today);
+            transform: scale(1.1);
+        }
+
+        /* Legend */
+        .legend {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            font-size: 0.8rem;
+            color: #888;
+        }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+    </style>
+</head>
+<body>
+
+    <h1>Deadline Target Tracker</h1>
+    <p class="subtitle">January 16, 2026 — May 16, 2026</p>
+
+    <div class="tracker-grid" id="grid">
+        </div>
+
+    <div class="legend">
+        <div class="legend-item">
+            <div class="legend-dot" style="background: var(--dot-filled)"></div> Passed
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: var(--dot-today)"></div> Today
+        </div>
+        <div class="legend-item">
+            <div class="legend-dot" style="background: var(--dot-empty)"></div> Remaining
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const START_DATE = new Date('2026-01-16T00:00:00');
+        const END_DATE = new Date('2026-05-16T00:00:00');
+        const gridContainer = document.getElementById('grid');
+
+        // Helper: Normalize a date to midnight to ensure accurate day comparison
+        function normalizeDate(date) {
+            const d = new Date(date);
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        // Generate Dots
+        function generateTracker() {
+            const today = normalizeDate(new Date());
+            let currentDate = new Date(START_DATE);
+            
+            // Loop until we reach the end date
+            while (currentDate <= END_DATE) {
+                const dot = document.createElement('div');
+                dot.classList.add('dot');
+                
+                // Format date for tooltip
+                const dateString = currentDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+                dot.setAttribute('data-date', dateString);
+
+                const normalizedCurrent = normalizeDate(currentDate);
+
+                if (normalizedCurrent < today) {
+                    // Day has strictly passed
+                    dot.classList.add('filled');
+                } else if (normalizedCurrent.getTime() === today.getTime()) {
+                    // It is exactly today
+                    dot.classList.add('today');
+                }
+                
+                gridContainer.appendChild(dot);
+
+                // Increment day by 1
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+        }
+
+        generateTracker();
+    </script>
+</body>
+</html>

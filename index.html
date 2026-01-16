@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deadline & Links Tracker</title>
+    <title>Deadline & Quick Links</title>
     <style>
         :root {
             --bg-color: #0d1117; /* GitHub Dark Dim */
             --panel-bg: #161b22;
             --text-color: #c9d1d9;
             --text-muted: #8b949e;
-            --accent-color: #238636; /* GitHub Green */
+            --accent-color: #238636; /* Green (Utilized) */
             --accent-hover: #2ea043;
-            --danger-color: #f85149;
+            --danger-color: #da3633; /* Red (Wasted) */
             --dot-empty: #21262d;
             --dot-today: #f0f6fc;
-            /* UPDATED: Larger sizes to fill space better */
             --dot-size: 24px; 
             --gap-size: 8px;  
             --border-color: #30363d;
@@ -29,29 +28,27 @@
             padding: 40px;
             min-height: 100vh;
             display: flex;
-            justify-content: center; /* Center horizontally */
-            align-items: center;     /* Center vertically */
+            justify-content: center;
+            align-items: center;
             box-sizing: border-box;
         }
 
         .container {
             display: flex;
-            /* UPDATED: width: fit-content ensures panels stay close together */
             width: fit-content; 
             max-width: 1400px;
-            gap: 60px; /* Space between Tracker and Links */
+            gap: 60px;
         }
 
         /* --- LEFT PANEL: Tracker --- */
         .left-panel {
             display: flex;
             flex-direction: column;
-            /* No flex-grow, let it be its natural size */
         }
 
         h1 {
             margin: 0 0 5px 0;
-            font-size: 1.8rem; /* Slightly larger title */
+            font-size: 1.8rem;
             font-weight: 600;
             color: #ffffff;
             letter-spacing: 0.5px;
@@ -108,18 +105,22 @@
             width: var(--dot-size);
             height: var(--dot-size);
             background-color: var(--dot-empty);
-            border-radius: 4px; /* Slightly more rounded */
+            border-radius: 4px;
             position: relative;
-            cursor: pointer;
             transition: transform 0.1s ease;
+        }
+        
+        /* Only passed days are clickable */
+        .dot.interactive {
+            cursor: pointer;
         }
 
         .dot:hover {
             transform: scale(1.15);
-            background-color: #30363d;
             z-index: 5;
         }
-
+        
+        /* Tooltip */
         .dot:hover::after {
             content: attr(data-date);
             position: absolute;
@@ -137,13 +138,38 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        .dot.filled { background-color: var(--accent-color); }
+        /* --- STATUS COLORS --- */
+        
+        /* Default Passed (Utilized) */
+        .dot.filled { 
+            background-color: var(--accent-color); 
+        }
+        
+        /* Wasted (Red) */
+        .dot.wasted {
+            background-color: var(--danger-color);
+        }
+
+        /* Today */
         .dot.today { 
             background-color: var(--dot-today); 
             box-shadow: 0 0 12px rgba(255,255,255,0.3); 
             z-index: 2;
             transform: scale(1.1);
         }
+        
+        /* Today can also be wasted */
+        .dot.today.wasted {
+            background-color: var(--danger-color); /* Overwrite white if marked wasted */
+            box-shadow: 0 0 10px var(--danger-color);
+        }
+        
+        /* Today can also be utilized explicitly */
+        .dot.today.filled {
+            background-color: var(--accent-color);
+             box-shadow: 0 0 10px var(--accent-color);
+        }
+
 
         /* Footer */
         .tracker-footer {
@@ -174,12 +200,11 @@
             padding: 25px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            min-width: 320px; /* Slightly wider */
+            min-width: 320px;
             width: 320px;
             display: flex;
             flex-direction: column;
             height: fit-content;
-            /* Sticky positioning allows it to stay in view if the list is long */
             position: sticky;
             top: 40px;
         }
@@ -229,7 +254,6 @@
             overflow-y: auto;
         }
 
-        /* Custom Scrollbar for links list */
         .links-list::-webkit-scrollbar { width: 6px; }
         .links-list::-webkit-scrollbar-track { background: transparent; }
         .links-list::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
@@ -262,27 +286,18 @@
             overflow: hidden;
         }
 
-        .link-name {
-            font-weight: 600;
-            font-size: 0.9rem;
-            color: #58a6ff;
-        }
+        .link-name { font-weight: 600; font-size: 0.9rem; color: #58a6ff; }
         
         .link-url-preview {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 220px;
+            font-size: 0.75rem; color: var(--text-muted);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 220px;
         }
 
         .btn-delete {
             background: transparent; border: none; color: var(--text-muted);
             cursor: pointer; font-size: 1.2rem; padding: 6px;
             border-radius: 4px; display: flex; align-items: center; justify-content: center;
-            opacity: 0.6;
-            transition: opacity 0.2s;
+            opacity: 0.6; transition: opacity 0.2s;
         }
         .btn-delete:hover { color: var(--danger-color); background: rgba(248, 81, 73, 0.1); opacity: 1; }
 
@@ -298,7 +313,7 @@
 <div class="container">
 
     <div class="left-panel">
-        <h1 id="main-title">Deadline Target Tracker</h1>
+        <h1 id="main-title">Deadline Tracker</h1>
         <p class="subtitle" id="date-range-text">Loading...</p>
 
         <div class="stats-container">
@@ -323,9 +338,9 @@
 
         <div class="tracker-footer">
             <div class="legend">
-                <div class="legend-item"><div class="legend-dot" style="background: var(--accent-color)"></div>Passed</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--accent-color)"></div>Utilized</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--danger-color)"></div>Wasted</div>
                 <div class="legend-item"><div class="legend-dot" style="background: var(--dot-today)"></div>Today</div>
-                <div class="legend-item"><div class="legend-dot" style="background: var(--dot-empty)"></div>Left</div>
             </div>
             
             <div class="date-input-group">
@@ -362,11 +377,12 @@
     const gridContainer = document.getElementById('grid');
     const dateRangeText = document.getElementById('date-range-text');
     const deadlinePicker = document.getElementById('deadline-picker');
-    
-    // Stats Elements
     const statPassedEl = document.getElementById('stat-passed');
     const statLeftEl = document.getElementById('stat-left');
     const statTotalEl = document.getElementById('stat-total');
+
+    // Load statuses from storage (Key: 'YYYY-MM-DD', Value: 'wasted' or 'utilized')
+    let dayStatuses = JSON.parse(localStorage.getItem('tracker_statuses')) || {};
 
     function normalizeDate(date) {
         const d = new Date(date);
@@ -378,6 +394,46 @@
         return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
+    // Generate a consistent key for storage
+    function getDateKey(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    function toggleDayStatus(dateKey, dotElement) {
+        // Current logic: Default (Undefined) -> Wasted -> Utilized -> Wasted...
+        // Note: 'filled' class is the default green (Utilized).
+        
+        const currentStatus = dayStatuses[dateKey];
+        
+        if (currentStatus === 'wasted') {
+            // Switch to Utilized
+            dayStatuses[dateKey] = 'utilized';
+        } else {
+            // Switch to Wasted (from default or utilized)
+            dayStatuses[dateKey] = 'wasted';
+        }
+
+        localStorage.setItem('tracker_statuses', JSON.stringify(dayStatuses));
+        
+        // Update Visuals immediately
+        applyDotStatus(dotElement, dayStatuses[dateKey]);
+    }
+
+    function applyDotStatus(dot, status) {
+        // Reset classes
+        dot.classList.remove('wasted', 'filled');
+        
+        if (status === 'wasted') {
+            dot.classList.add('wasted');
+        } else {
+            // Default or 'utilized' is Green
+            dot.classList.add('filled');
+        }
+    }
+
     function generateTracker(targetDateString) {
         gridContainer.innerHTML = '';
         const endDate = new Date(targetDateString + 'T00:00:00');
@@ -387,30 +443,22 @@
         let currentDate = new Date(START_DATE);
         let dayCounter = 0;
 
-        // 1. Update Date Range Text
+        // Stats
         dateRangeText.innerText = `${formatDateReadable(START_DATE)} — ${formatDateReadable(endDate)}`;
-
-        // 2. Calculate Stats
         const msPerDay = 1000 * 60 * 60 * 24;
         const totalDuration = Math.round((endDate - startNorm) / msPerDay);
-        
         let daysPassed = 0;
-        if (today > startNorm) {
-            daysPassed = Math.round((today - startNorm) / msPerDay);
-        }
-        // Clamp
+        if (today > startNorm) daysPassed = Math.round((today - startNorm) / msPerDay);
         if (daysPassed > totalDuration) daysPassed = totalDuration;
         if (daysPassed < 0) daysPassed = 0;
 
-        const daysLeft = totalDuration - daysPassed;
-
-        // Update Stats UI
         statPassedEl.innerText = daysPassed;
-        statLeftEl.innerText = daysLeft;
+        statLeftEl.innerText = totalDuration - daysPassed;
         statTotalEl.innerText = totalDuration;
 
-        // 3. Generate Grid
+        // Loop
         while (currentDate <= endDate) {
+            // Week Labels
             if (dayCounter % 7 === 0) {
                 const weekNum = (dayCounter / 7) + 1;
                 const weekLabel = document.createElement('div');
@@ -421,15 +469,41 @@
 
             const dot = document.createElement('div');
             dot.classList.add('dot');
+            
             const dateString = currentDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
             dot.setAttribute('data-date', dateString);
+            
             const normalizedCurrent = normalizeDate(currentDate);
+            const dateKey = getDateKey(normalizedCurrent);
 
-            if (normalizedCurrent < today) {
-                dot.classList.add('filled');
-            } else if (normalizedCurrent.getTime() === today.getTime()) {
-                dot.classList.add('today');
-            }
+            // Logic for passed/today/future
+            if (normalizedCurrent <= today) {
+                // It is passed or is today
+                dot.classList.add('interactive');
+                
+                // Add Click Handler
+                dot.onclick = () => toggleDayStatus(dateKey, dot);
+
+                // Check stored status
+                const storedStatus = dayStatuses[dateKey];
+                
+                if (normalizedCurrent.getTime() === today.getTime()) {
+                    // It is TODAY
+                    dot.classList.add('today');
+                    // If specifically marked wasted/utilized, override the white
+                    if (storedStatus) applyDotStatus(dot, storedStatus);
+                } else {
+                    // PASSED DAYS
+                    if (storedStatus) {
+                        applyDotStatus(dot, storedStatus);
+                    } else {
+                        // Default to Green (Utilized) if no status saved
+                        dot.classList.add('filled');
+                    }
+                }
+
+            } 
+            
             gridContainer.appendChild(dot);
 
             currentDate.setDate(currentDate.getDate() + 1);
@@ -473,7 +547,6 @@
             const li = document.createElement('li');
             li.classList.add('link-item');
             
-            // Whole element click
             li.onclick = () => window.open(link.url, '_blank');
             
             li.innerHTML = `

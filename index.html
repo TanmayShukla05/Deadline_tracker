@@ -3,34 +3,51 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deadline Target Tracker</title>
+    <title>Deadline & Links Tracker</title>
     <style>
         :root {
             --bg-color: #1a1a1a;
+            --panel-bg: #252525;
             --text-color: #ffffff;
+            --text-muted: #888888;
+            --accent-color: #4caf50;
+            --danger-color: #ff5252;
             --dot-empty: #333333;
-            --dot-filled: #4caf50;
             --dot-today: #ffffff;
-            --dot-size: 20px;
-            --gap-size: 10px;
+            --dot-size: 18px; 
+            --gap-size: 8px;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
+            margin: 0;
+            padding: 40px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Align to top */
+            box-sizing: border-box;
+        }
+
+        /* --- Main Layout Container --- */
+        .container {
+            display: flex;
+            width: 100%;
+            max-width: 1100px;
+            gap: 50px;
+        }
+
+        /* --- LEFT PANEL: Tracker --- */
+        .left-panel {
+            flex: 2;
             display: flex;
             flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px;
-            padding-bottom: 60px; /* Extra padding for the fixed footer */
         }
 
         h1 {
-            margin-bottom: 5px;
+            margin: 0 0 5px 0;
             font-size: 1.5rem;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -38,239 +55,359 @@
 
         p.subtitle {
             margin-top: 0;
-            margin-bottom: 40px;
-            color: #888;
+            margin-bottom: 30px;
+            color: var(--text-muted);
             font-size: 0.9rem;
         }
 
-        /* The Grid Container */
         .tracker-grid {
             display: grid;
             grid-template-columns: max-content repeat(7, 1fr);
             gap: var(--gap-size);
             align-items: center;
-            max-width: 500px;
         }
 
-        /* Week Labels */
         .week-label {
-            color: #666;
-            font-size: 0.75rem;
+            color: #555;
+            font-size: 0.7rem;
             font-weight: bold;
-            padding-right: 15px;
+            padding-right: 12px;
             text-align: right;
             user-select: none;
         }
 
-        /* The Dot Styling */
         .dot {
             width: var(--dot-size);
             height: var(--dot-size);
             background-color: var(--dot-empty);
             border-radius: 50%;
-            transition: all 0.3s ease;
             position: relative;
             cursor: pointer;
         }
 
-        /* Tooltip */
         .dot:hover::after {
             content: attr(data-date);
             position: absolute;
-            bottom: 130%;
+            bottom: 140%;
             left: 50%;
             transform: translateX(-50%);
             background: #000;
             color: #fff;
             padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             white-space: nowrap;
             pointer-events: none;
             z-index: 10;
             border: 1px solid #333;
         }
 
-        /* States */
-        .dot.filled {
-            background-color: var(--dot-filled);
-            box-shadow: 0 0 5px var(--dot-filled);
-        }
+        .dot.filled { background-color: var(--accent-color); box-shadow: 0 0 5px var(--accent-color); }
+        .dot.today { background-color: var(--dot-today); box-shadow: 0 0 10px var(--dot-today); transform: scale(1.2); z-index: 2; }
 
-        .dot.today {
-            background-color: var(--dot-today);
-            box-shadow: 0 0 10px var(--dot-today);
-            transform: scale(1.2);
-            z-index: 2;
-        }
-
-        /* Legend */
-        .legend {
-            margin-top: 40px;
+        /* Left Panel Footer (Legend + Date Picker) */
+        .tracker-footer {
+            margin-top: 30px;
             display: flex;
-            gap: 20px;
-            font-size: 0.8rem;
-            color: #888;
-        }
-        .legend-item { display: flex; align-items: center; gap: 8px; }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-
-        /* Settings Panel (Bottom Right) */
-        .settings-panel {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #2a2a2a;
-            padding: 10px 15px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            opacity: 0.3; /* Subtle by default */
-            transition: opacity 0.3s ease;
+            border-top: 1px solid #333;
+            padding-top: 20px;
         }
-        .settings-panel:hover {
-            opacity: 1; /* Fully visible on hover */
+
+        .legend { display: flex; gap: 15px; font-size: 0.75rem; color: var(--text-muted); }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+        .date-input-group { display: flex; align-items: center; gap: 10px; }
+        .date-input-group label { font-size: 0.75rem; color: var(--text-muted); }
+        input[type="date"] {
+            background: #2a2a2a; border: 1px solid #444; color: #fff;
+            padding: 4px 8px; border-radius: 4px; cursor: pointer;
+        }
+
+        /* --- RIGHT PANEL: Links Manager --- */
+        .right-panel {
+            flex: 1;
+            background-color: var(--panel-bg);
+            padding: 25px;
+            border-radius: 16px;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            height: fit-content;
+        }
+
+        .panel-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* Add Link Form */
+        .add-link-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 25px;
         }
         
-        .settings-label {
-            font-size: 0.8rem;
-            color: #aaa;
+        .input-row { display: flex; gap: 8px; }
+        
+        input[type="text"], input[type="url"] {
+            background: #111; border: 1px solid #333; color: white;
+            padding: 8px 12px; border-radius: 6px; flex: 1; outline: none;
+            font-size: 0.85rem;
+        }
+        input:focus { border-color: #555; }
+
+        button.btn-add {
+            background: var(--accent-color); border: none; color: white;
+            padding: 8px; border-radius: 6px; cursor: pointer; font-weight: bold;
+            font-size: 0.8rem; transition: background 0.2s;
+        }
+        button.btn-add:hover { background: #43a047; }
+
+        /* Links List */
+        .links-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
 
-        input[type="date"] {
+        .link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background: #333;
-            border: 1px solid #555;
+            padding: 10px 12px;
+            border-radius: 8px;
+            transition: transform 0.2s;
+        }
+        .link-item:hover { transform: translateX(2px); background: #3a3a3a; }
+
+        .link-text {
             color: #fff;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-family: inherit;
-            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        .link-text:hover { text-decoration: underline; }
+
+        .btn-delete {
+            background: transparent; border: none; color: #666;
+            cursor: pointer; font-size: 1.2rem; line-height: 1;
+            padding: 0 4px;
+        }
+        .btn-delete:hover { color: var(--danger-color); }
+
+        /* Responsive Breakpoint */
+        @media (max-width: 800px) {
+            .container { flex-direction: column; gap: 40px; }
+            .right-panel { width: 100%; min-width: auto; box-sizing: border-box; }
         }
 
     </style>
 </head>
 <body>
 
-    <h1 id="main-title">Deadline Target Tracker</h1>
-    <p class="subtitle" id="date-range-text">Loading...</p>
+<div class="container">
 
-    <div class="tracker-grid" id="grid">
-        </div>
+    <div class="left-panel">
+        <h1 id="main-title">Deadline Target Tracker</h1>
+        <p class="subtitle" id="date-range-text">Loading...</p>
 
-    <div class="legend">
-        <div class="legend-item">
-            <div class="legend-dot" style="background: var(--dot-filled)"></div> Passed
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot" style="background: var(--dot-today)"></div> Today
-        </div>
-        <div class="legend-item">
-            <div class="legend-dot" style="background: var(--dot-empty)"></div> Remaining
-        </div>
-    </div>
+        <div class="tracker-grid" id="grid">
+            </div>
 
-    <div class="settings-panel">
-        <span class="settings-label">Target Date:</span>
-        <input type="date" id="deadline-picker">
-    </div>
-
-    <script>
-        // Constants
-        const START_DATE = new Date('2026-01-16T00:00:00');
-        const DEFAULT_END_DATE = '2026-05-16'; // String format for easy parsing
-        
-        // DOM Elements
-        const gridContainer = document.getElementById('grid');
-        const dateRangeText = document.getElementById('date-range-text');
-        const deadlinePicker = document.getElementById('deadline-picker');
-
-        // Helper: Normalize date to midnight
-        function normalizeDate(date) {
-            const d = new Date(date);
-            d.setHours(0, 0, 0, 0);
-            return d;
-        }
-
-        // Helper: Format Date for Display
-        function formatDateReadable(date) {
-            return date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
-        }
-
-        // Main Function: Generate the Grid
-        function generateTracker(targetDateString) {
-            // Clear existing grid
-            gridContainer.innerHTML = '';
+        <div class="tracker-footer">
+            <div class="legend">
+                <div class="legend-item"><div class="legend-dot" style="background: var(--accent-color)"></div>Passed</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--dot-today)"></div>Today</div>
+                <div class="legend-item"><div class="legend-dot" style="background: var(--dot-empty)"></div>Left</div>
+            </div>
             
-            const endDate = new Date(targetDateString + 'T00:00:00');
-            const today = normalizeDate(new Date());
-            let currentDate = new Date(START_DATE);
-            let dayCounter = 0;
+            <div class="date-input-group">
+                <label>Deadline:</label>
+                <input type="date" id="deadline-picker">
+            </div>
+        </div>
+    </div>
 
-            // Update Subtitle Text
-            dateRangeText.innerText = `${formatDateReadable(START_DATE)} — ${formatDateReadable(endDate)}`;
+    <div class="right-panel">
+        <div class="panel-header">Quick Links</div>
+        
+        <div class="add-link-form">
+            <input type="text" id="link-name" placeholder="Mention Name (e.g., Github)" autocomplete="off">
+            <div class="input-row">
+                <input type="url" id="link-url" placeholder="https://..." autocomplete="off">
+                <button class="btn-add" id="btn-add-link">Add</button>
+            </div>
+        </div>
 
-            // Loop
-            while (currentDate <= endDate) {
-                
-                // 1. Add Week Label
-                if (dayCounter % 7 === 0) {
-                    const weekNum = (dayCounter / 7) + 1;
-                    const weekLabel = document.createElement('div');
-                    weekLabel.classList.add('week-label');
-                    weekLabel.innerText = 'W' + weekNum;
-                    gridContainer.appendChild(weekLabel);
-                }
+        <ul class="links-list" id="links-list">
+            </ul>
+    </div>
 
-                // 2. Create Dot
-                const dot = document.createElement('div');
-                dot.classList.add('dot');
-                
-                const dateString = currentDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
-                dot.setAttribute('data-date', dateString);
+</div>
 
-                const normalizedCurrent = normalizeDate(currentDate);
+<script>
+    // ==========================================
+    // PART 1: TRACKER LOGIC
+    // ==========================================
+    const START_DATE = new Date('2026-01-16T00:00:00');
+    const DEFAULT_END_DATE = '2026-05-16';
+    
+    const gridContainer = document.getElementById('grid');
+    const dateRangeText = document.getElementById('date-range-text');
+    const deadlinePicker = document.getElementById('deadline-picker');
 
-                if (normalizedCurrent < today) {
-                    dot.classList.add('filled');
-                } else if (normalizedCurrent.getTime() === today.getTime()) {
-                    dot.classList.add('today');
-                }
-                
-                gridContainer.appendChild(dot);
+    function normalizeDate(date) {
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d;
+    }
 
-                // 3. Increment
-                currentDate.setDate(currentDate.getDate() + 1);
-                dayCounter++;
+    function formatDateReadable(date) {
+        return date.toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' });
+    }
+
+    function generateTracker(targetDateString) {
+        gridContainer.innerHTML = '';
+        const endDate = new Date(targetDateString + 'T00:00:00');
+        const today = normalizeDate(new Date());
+        let currentDate = new Date(START_DATE);
+        let dayCounter = 0;
+
+        dateRangeText.innerText = `${formatDateReadable(START_DATE)} — ${formatDateReadable(endDate)}`;
+
+        while (currentDate <= endDate) {
+            if (dayCounter % 7 === 0) {
+                const weekNum = (dayCounter / 7) + 1;
+                const weekLabel = document.createElement('div');
+                weekLabel.classList.add('week-label');
+                weekLabel.innerText = 'W' + weekNum;
+                gridContainer.appendChild(weekLabel);
             }
+
+            const dot = document.createElement('div');
+            dot.classList.add('dot');
+            const dateString = currentDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+            dot.setAttribute('data-date', dateString);
+            const normalizedCurrent = normalizeDate(currentDate);
+
+            if (normalizedCurrent < today) {
+                dot.classList.add('filled');
+            } else if (normalizedCurrent.getTime() === today.getTime()) {
+                dot.classList.add('today');
+            }
+            gridContainer.appendChild(dot);
+
+            currentDate.setDate(currentDate.getDate() + 1);
+            dayCounter++;
+        }
+    }
+
+    // Init Tracker
+    const savedDate = localStorage.getItem('tracker_deadline');
+    const initialDate = savedDate || DEFAULT_END_DATE;
+    deadlinePicker.value = initialDate;
+    deadlinePicker.min = '2026-01-17';
+    generateTracker(initialDate);
+
+    deadlinePicker.addEventListener('change', (e) => {
+        if(e.target.value) {
+            generateTracker(e.target.value);
+            localStorage.setItem('tracker_deadline', e.target.value);
+        }
+    });
+
+
+    // ==========================================
+    // PART 2: LINKS MANAGER LOGIC
+    // ==========================================
+    const linkNameInput = document.getElementById('link-name');
+    const linkUrlInput = document.getElementById('link-url');
+    const addLinkBtn = document.getElementById('btn-add-link');
+    const linksListEl = document.getElementById('links-list');
+
+    // Default links if none exist
+    const defaultLinks = [
+        { id: 1, name: "Google", url: "https://google.com" },
+        { id: 2, name: "GitHub", url: "https://github.com" }
+    ];
+
+    // Load from LocalStorage
+    let myLinks = JSON.parse(localStorage.getItem('tracker_links')) || defaultLinks;
+
+    function renderLinks() {
+        linksListEl.innerHTML = '';
+        myLinks.forEach(link => {
+            const li = document.createElement('li');
+            li.classList.add('link-item');
+            
+            li.innerHTML = `
+                <a href="${link.url}" target="_blank" class="link-text">${link.name}</a>
+                <button class="btn-delete" onclick="deleteLink(${link.id})">&times;</button>
+            `;
+            linksListEl.appendChild(li);
+        });
+    }
+
+    function addLink() {
+        const name = linkNameInput.value.trim();
+        let url = linkUrlInput.value.trim();
+
+        if (!name || !url) return alert("Please enter both a name and a URL.");
+        
+        // Basic URL fix
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
         }
 
-        // --- Initialization & Event Listeners ---
+        const newLink = {
+            id: Date.now(), // Unique ID based on timestamp
+            name: name,
+            url: url
+        };
 
-        // 1. Load preference from LocalStorage or use default
-        const savedDate = localStorage.getItem('tracker_deadline');
-        const initialDate = savedDate || DEFAULT_END_DATE;
+        myLinks.push(newLink);
+        saveAndRender();
+        
+        // Clear inputs
+        linkNameInput.value = '';
+        linkUrlInput.value = '';
+    }
 
-        // 2. Set the input value
-        deadlinePicker.value = initialDate;
-        deadlinePicker.min = '2026-01-17'; // Prevent picking dates before start date
+    // Exposed to global scope for the onclick handler
+    window.deleteLink = function(id) {
+        myLinks = myLinks.filter(link => link.id !== id);
+        saveAndRender();
+    };
 
-        // 3. Initial Render
-        generateTracker(initialDate);
+    function saveAndRender() {
+        localStorage.setItem('tracker_links', JSON.stringify(myLinks));
+        renderLinks();
+    }
 
-        // 4. Handle User Change
-        deadlinePicker.addEventListener('change', (e) => {
-            const newDate = e.target.value;
-            if (newDate) {
-                // Update Grid
-                generateTracker(newDate);
-                // Save to browser memory
-                localStorage.setItem('tracker_deadline', newDate);
-            }
-        });
+    // Event Listeners
+    addLinkBtn.addEventListener('click', addLink);
+    
+    // Allow "Enter" key to submit
+    linkUrlInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') addLink();
+    });
 
-    </script>
+    // Initial Render
+    renderLinks();
+
+</script>
+
 </body>
 </html>

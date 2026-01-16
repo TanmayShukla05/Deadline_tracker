@@ -74,10 +74,7 @@
             width: fit-content;
         }
         
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-        }
+        .stat-item { display: flex; flex-direction: column; }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-value { font-weight: bold; color: #fff; font-size: 1.2rem; margin-top: 2px; }
         .stat-value.green { color: #4caf50; }
@@ -92,79 +89,42 @@
         }
 
         .week-label {
-            color: #484f58;
-            font-size: 0.75rem;
-            font-family: monospace;
-            padding-right: 12px;
-            text-align: right;
-            user-select: none;
-            line-height: var(--dot-size);
+            color: #484f58; font-size: 0.75rem; font-family: monospace;
+            padding-right: 12px; text-align: right; user-select: none; line-height: var(--dot-size);
         }
 
         .dot {
-            width: var(--dot-size);
-            height: var(--dot-size);
-            background-color: var(--dot-empty);
-            border-radius: 4px;
-            position: relative;
-            transition: transform 0.1s ease;
+            width: var(--dot-size); height: var(--dot-size); background-color: var(--dot-empty);
+            border-radius: 4px; position: relative; transition: transform 0.1s ease;
         }
         
+        /* Only strictly passed days get the pointer */
         .dot.interactive { cursor: pointer; }
 
-        .dot:hover {
-            transform: scale(1.15);
-            z-index: 5;
-        }
+        .dot:hover { transform: scale(1.15); z-index: 5; }
         
         .dot:hover::after {
-            content: attr(data-date);
-            position: absolute;
-            bottom: 140%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #6e7681;
-            color: #fff;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-size: 0.75rem;
-            white-space: nowrap;
-            pointer-events: none;
-            z-index: 10;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            content: attr(data-date); position: absolute; bottom: 140%; left: 50%;
+            transform: translateX(-50%); background: #6e7681; color: #fff; padding: 6px 10px;
+            border-radius: 4px; font-size: 0.75rem; white-space: nowrap; pointer-events: none;
+            z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        /* --- STATUS COLORS --- */
+        /* Status Colors */
         .dot.filled { background-color: var(--accent-color); } /* Utilized */
         .dot.wasted { background-color: var(--danger-color); } /* Wasted */
 
         .dot.today { 
             background-color: var(--dot-today); 
             box-shadow: 0 0 12px rgba(255,255,255,0.3); 
-            z-index: 2;
-            transform: scale(1.1);
+            z-index: 2; transform: scale(1.1);
+            cursor: default; /* Today is not clickable */
         }
-        
-        .dot.today.wasted {
-            background-color: var(--danger-color); 
-            box-shadow: 0 0 10px var(--danger-color);
-        }
-        
-        .dot.today.filled {
-            background-color: var(--accent-color);
-             box-shadow: 0 0 10px var(--accent-color);
-        }
-
 
         /* Footer */
         .tracker-footer {
-            margin-top: 30px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px solid var(--border-color);
-            padding-top: 20px;
-            width: 100%; 
+            margin-top: 30px; display: flex; justify-content: space-between; align-items: center;
+            border-top: 1px solid var(--border-color); padding-top: 20px; width: 100%; 
         }
 
         .legend { display: flex; gap: 20px; font-size: 0.8rem; color: var(--text-muted); }
@@ -181,43 +141,24 @@
 
         /* --- RIGHT PANEL: Links --- */
         .right-panel {
-            background-color: var(--panel-bg);
-            padding: 25px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            min-width: 300px; /* Reduced width slightly */
-            width: 300px;
-            display: flex;
-            flex-direction: column;
-            height: fit-content;
-            position: sticky;
-            top: 40px;
+            background-color: var(--panel-bg); padding: 25px; border-radius: 12px;
+            border: 1px solid var(--border-color); min-width: 300px; width: 300px;
+            display: flex; flex-direction: column; height: fit-content;
+            position: sticky; top: 40px;
         }
 
         .panel-header {
-            font-size: 1rem;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: var(--text-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            font-size: 1rem; font-weight: 600; margin-bottom: 20px;
+            color: var(--text-color); display: flex; justify-content: space-between; align-items: center;
         }
 
-        .add-link-form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-bottom: 25px;
-        }
-        
+        .add-link-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
         .input-row { display: flex; gap: 8px; }
         
         input[type="text"], input[type="url"] {
             background: var(--bg-color); border: 1px solid var(--border-color); 
             color: var(--text-color); padding: 8px 12px; border-radius: 6px; 
-            flex: 1; outline: none; font-size: 0.85rem;
-            transition: border-color 0.2s;
+            flex: 1; outline: none; font-size: 0.85rem; transition: border-color 0.2s;
         }
         input:focus { border-color: #58a6ff; }
 
@@ -229,59 +170,45 @@
         button.btn-add:hover { background: var(--accent-hover); }
 
         .links-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            gap: 8px; /* Tighter gap */
-            max-height: 500px;
-            overflow-y: auto;
+            list-style: none; padding: 0; margin: 0; display: flex;
+            flex-direction: column; gap: 8px; max-height: 500px; overflow-y: auto;
         }
 
         .links-list::-webkit-scrollbar { width: 6px; }
         .links-list::-webkit-scrollbar-track { background: transparent; }
         .links-list::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
 
-        /* UPDATED: Compact Link Item */
         .link-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-color);
-            padding: 10px 14px; /* Reduced padding */
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-            transition: all 0.2s ease;
-            cursor: pointer;
-            position: relative;
-            user-select: none;
+            display: flex; justify-content: space-between; align-items: center;
+            background: var(--bg-color); padding: 10px 14px; border-radius: 6px;
+            border: 1px solid var(--border-color); transition: background 0.2s ease, transform 0.2s;
+            cursor: grab; /* Indicates Draggable */
+            position: relative; user-select: none;
+        }
+        
+        .link-item:active { cursor: grabbing; }
+
+        .link-item.dragging {
+            opacity: 0.5;
+            background: #21262d;
+            border: 1px dashed #58a6ff;
         }
         
         .link-item:hover {
             border-color: #8b949e;
-            transform: translateY(-2px);
             background: #21262d;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
         .link-name { 
-            font-weight: 600; 
-            font-size: 0.9rem; 
-            color: #58a6ff;
-            /* Ensure text doesn't overlap delete button if very long */
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 230px; 
+            font-weight: 600; font-size: 0.9rem; color: #58a6ff;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 230px; 
         }
 
         .btn-delete {
             background: transparent; border: none; color: var(--text-muted);
             cursor: pointer; font-size: 1.2rem; padding: 0 4px;
             border-radius: 4px; display: flex; align-items: center; justify-content: center;
-            opacity: 0.6; transition: opacity 0.2s;
-            margin-left: 10px;
+            opacity: 0.6; transition: opacity 0.2s; margin-left: 10px;
         }
         .btn-delete:hover { color: var(--danger-color); background: rgba(248, 81, 73, 0.1); opacity: 1; }
 
@@ -317,8 +244,7 @@
             </div>
         </div>
 
-        <div class="tracker-grid" id="grid">
-            </div>
+        <div class="tracker-grid" id="grid"></div>
 
         <div class="tracker-footer">
             <div class="legend">
@@ -326,7 +252,6 @@
                 <div class="legend-item"><div class="legend-dot" style="background: var(--danger-color)"></div>Wasted</div>
                 <div class="legend-item"><div class="legend-dot" style="background: var(--dot-today)"></div>Today</div>
             </div>
-            
             <div class="date-input-group">
                 <label>Target:</label>
                 <input type="date" id="deadline-picker">
@@ -336,7 +261,6 @@
 
     <div class="right-panel">
         <div class="panel-header">Quick Links</div>
-        
         <div class="add-link-form">
             <input type="text" id="link-name" placeholder="Name" autocomplete="off">
             <div class="input-row">
@@ -344,9 +268,7 @@
                 <button class="btn-add" id="btn-add-link">Add</button>
             </div>
         </div>
-
-        <ul class="links-list" id="links-list">
-            </ul>
+        <ul class="links-list" id="links-list"></ul>
     </div>
 
 </div>
@@ -441,22 +363,26 @@
             const normalizedCurrent = normalizeDate(currentDate);
             const dateKey = getDateKey(normalizedCurrent);
 
-            if (normalizedCurrent <= today) {
+            // UPDATED LOGIC:
+            // 1. Strictly Passed Days: Clickable, Status Logic
+            if (normalizedCurrent < today) {
                 dot.classList.add('interactive');
                 dot.onclick = () => toggleDayStatus(dateKey, dot);
-                const storedStatus = dayStatuses[dateKey];
                 
-                if (normalizedCurrent.getTime() === today.getTime()) {
-                    dot.classList.add('today');
-                    if (storedStatus) applyDotStatus(dot, storedStatus);
+                const storedStatus = dayStatuses[dateKey];
+                if (storedStatus) {
+                    applyDotStatus(dot, storedStatus);
                 } else {
-                    if (storedStatus) {
-                        applyDotStatus(dot, storedStatus);
-                    } else {
-                        dot.classList.add('filled');
-                    }
+                    dot.classList.add('filled'); // Default Utilized
                 }
             } 
+            // 2. Today: Visual only, NOT clickable
+            else if (normalizedCurrent.getTime() === today.getTime()) {
+                dot.classList.add('today');
+                // No onClick event here
+            }
+            // 3. Future: Empty
+
             gridContainer.appendChild(dot);
             currentDate.setDate(currentDate.getDate() + 1);
             dayCounter++;
@@ -477,7 +403,7 @@
     });
 
     // ==========================================
-    // PART 2: LINKS MANAGER LOGIC
+    // PART 2: LINKS MANAGER LOGIC (With Drag & Drop)
     // ==========================================
     const linkNameInput = document.getElementById('link-name');
     const linkUrlInput = document.getElementById('link-url');
@@ -496,33 +422,80 @@
         myLinks.forEach(link => {
             const li = document.createElement('li');
             li.classList.add('link-item');
+            li.setAttribute('draggable', 'true'); // Enable Drag
+            li.setAttribute('data-id', link.id);  // Identify link
+
+            // Click to Open
+            li.onclick = (e) => {
+                // Prevent click if we were dragging (simple heuristic)
+                if (li.classList.contains('dragging')) return;
+                window.open(link.url, '_blank');
+            };
             
-            li.onclick = () => window.open(link.url, '_blank');
-            
-            // UPDATED: Only displaying Name, no URL
             li.innerHTML = `
                 <span class="link-name">${link.name}</span>
                 <button class="btn-delete" onclick="event.stopPropagation(); deleteLink(${link.id})">&times;</button>
             `;
+
+            // --- Drag & Drop Event Listeners ---
+            li.addEventListener('dragstart', () => {
+                li.classList.add('dragging');
+            });
+
+            li.addEventListener('dragend', () => {
+                li.classList.remove('dragging');
+                saveOrder(); // Save new order after drag ends
+            });
+
             linksListEl.appendChild(li);
         });
+    }
+
+    // --- Container Drag Events ---
+    linksListEl.addEventListener('dragover', (e) => {
+        e.preventDefault(); // Necessary to allow dropping
+        const afterElement = getDragAfterElement(linksListEl, e.clientY);
+        const draggable = document.querySelector('.dragging');
+        if (afterElement == null) {
+            linksListEl.appendChild(draggable);
+        } else {
+            linksListEl.insertBefore(draggable, afterElement);
+        }
+    });
+
+    // Helper to determine where to place the dragged element
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.link-item:not(.dragging)')];
+
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Update Array Order based on DOM and Save
+    function saveOrder() {
+        const newOrderIds = [...linksListEl.querySelectorAll('.link-item')].map(li => parseInt(li.getAttribute('data-id')));
+        
+        // Re-sort myLinks array based on the DOM order
+        myLinks.sort((a, b) => {
+            return newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id);
+        });
+        
+        saveAndRender(false); // Save, but don't re-render entire list (to avoid flicker)
     }
 
     function addLink() {
         const name = linkNameInput.value.trim();
         let url = linkUrlInput.value.trim();
-
         if (!name || !url) return alert("Please enter both a name and a URL.");
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'https://' + url;
-        }
-
-        const newLink = {
-            id: Date.now(),
-            name: name,
-            url: url
-        };
-
+        if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+        const newLink = { id: Date.now(), name: name, url: url };
         myLinks.push(newLink);
         saveAndRender();
         linkNameInput.value = '';
@@ -534,9 +507,9 @@
         saveAndRender();
     };
 
-    function saveAndRender() {
+    function saveAndRender(shouldRender = true) {
         localStorage.setItem('tracker_links', JSON.stringify(myLinks));
-        renderLinks();
+        if (shouldRender) renderLinks();
     }
 
     addLinkBtn.addEventListener('click', addLink);

@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deadline & links</title>
+    <title>Deadline & Links</title>
     <style>
         :root {
-            --bg-color: #0d1117;
+            --bg-color: #0d1117; /* GitHub Dark Dim */
             --panel-bg: #161b22;
             --text-color: #c9d1d9;
             --text-muted: #8b949e;
-            --accent-color: #238636;
+            --accent-color: #238636; /* Green (Utilized) */
             --accent-hover: #2ea043;
-            --danger-color: #da3633;
+            --danger-color: #da3633; /* Red (Wasted) */
             --dot-empty: #21262d;
             --dot-today: #f0f6fc;
             --dot-size: 24px; 
@@ -38,96 +38,71 @@
             width: fit-content; 
             max-width: 1400px;
             gap: 60px;
-            position: relative;
         }
-
-        /* --- SETTINGS BUTTON --- */
-        .settings-btn {
-            position: absolute;
-            top: -30px;
-            right: 0;
-            background: transparent;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            font-size: 1.2rem;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-        .settings-btn:hover { opacity: 1; color: #58a6ff; }
-
-        /* --- STATUS INDICATOR --- */
-        .sync-status {
-            position: absolute;
-            top: -30px;
-            left: 0;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #666; }
-        .status-dot.syncing { background: #dbab09; box-shadow: 0 0 5px #dbab09; }
-        .status-dot.saved { background: #238636; box-shadow: 0 0 5px #238636; }
-        .status-dot.error { background: #da3633; }
-
-        /* --- MODAL --- */
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7);
-            display: none; justify-content: center; align-items: center;
-            z-index: 1000;
-        }
-        .modal {
-            background: var(--panel-bg);
-            padding: 30px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            width: 400px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        .modal h2 { margin-top: 0; color: #fff; font-size: 1.2rem; }
-        .modal p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 20px; }
-        .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; color: var(--text-color); margin-bottom: 5px; font-size: 0.85rem; }
-        .form-group input { 
-            width: 100%; padding: 8px; background: var(--bg-color); border: 1px solid var(--border-color);
-            color: #fff; border-radius: 4px; box-sizing: border-box;
-        }
-        .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .btn-cancel { background: transparent; border: 1px solid var(--border-color); color: var(--text-color); padding: 8px 16px; border-radius: 6px; cursor: pointer; }
-        .btn-save { background: var(--accent-color); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; }
 
         /* --- LEFT PANEL: Tracker --- */
-        .left-panel { display: flex; flex-direction: column; }
-        h1 { margin: 0 0 5px 0; font-size: 1.8rem; font-weight: 600; color: #ffffff; letter-spacing: 0.5px; }
-        p.subtitle { margin-top: 0; margin-bottom: 25px; color: var(--text-muted); font-size: 0.95rem; }
-
-        .stats-container {
-            display: flex; gap: 25px; margin-bottom: 25px; background: var(--panel-bg);
-            padding: 12px 20px; border-radius: 8px; border: 1px solid var(--border-color);
-            font-size: 0.9rem; width: fit-content;
+        .left-panel {
+            display: flex;
+            flex-direction: column;
         }
+
+        h1 {
+            margin: 0 0 5px 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        p.subtitle {
+            margin-top: 0;
+            margin-bottom: 25px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Stats Bar */
+        .stats-container {
+            display: flex;
+            gap: 25px;
+            margin-bottom: 25px;
+            background: var(--panel-bg);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            font-size: 0.9rem;
+            width: fit-content;
+        }
+        
         .stat-item { display: flex; flex-direction: column; }
         .stat-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
         .stat-value { font-weight: bold; color: #fff; font-size: 1.2rem; margin-top: 2px; }
         .stat-value.green { color: #4caf50; }
 
+        /* Grid */
         .tracker-grid {
-            display: grid; grid-template-columns: max-content repeat(7, 1fr);
-            gap: var(--gap-size); align-items: center; width: fit-content;
+            display: grid;
+            grid-template-columns: max-content repeat(7, 1fr);
+            gap: var(--gap-size);
+            align-items: center;
+            width: fit-content;
         }
+
         .week-label {
             color: #484f58; font-size: 0.75rem; font-family: monospace;
             padding-right: 12px; text-align: right; user-select: none; line-height: var(--dot-size);
         }
+
         .dot {
             width: var(--dot-size); height: var(--dot-size); background-color: var(--dot-empty);
             border-radius: 4px; position: relative; transition: transform 0.1s ease;
         }
+        
+        /* Only strictly passed days get the pointer */
         .dot.interactive { cursor: pointer; }
+
         .dot:hover { transform: scale(1.15); z-index: 5; }
+        
         .dot:hover::after {
             content: attr(data-date); position: absolute; bottom: 140%; left: 50%;
             transform: translateX(-50%); background: #6e7681; color: #fff; padding: 6px 10px;
@@ -135,20 +110,27 @@
             z-index: 10; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
 
-        .dot.filled { background-color: var(--accent-color); }
-        .dot.wasted { background-color: var(--danger-color); }
+        /* Status Colors */
+        .dot.filled { background-color: var(--accent-color); } /* Utilized */
+        .dot.wasted { background-color: var(--danger-color); } /* Wasted */
+
         .dot.today { 
-            background-color: var(--dot-today); box-shadow: 0 0 12px rgba(255,255,255,0.3); 
-            z-index: 2; transform: scale(1.1); cursor: default; 
+            background-color: var(--dot-today); 
+            box-shadow: 0 0 12px rgba(255,255,255,0.3); 
+            z-index: 2; transform: scale(1.1);
+            cursor: default; /* Today is not clickable */
         }
 
+        /* Footer */
         .tracker-footer {
             margin-top: 30px; display: flex; justify-content: space-between; align-items: center;
             border-top: 1px solid var(--border-color); padding-top: 20px; width: 100%; 
         }
+
         .legend { display: flex; gap: 20px; font-size: 0.8rem; color: var(--text-muted); }
         .legend-item { display: flex; align-items: center; gap: 8px; }
         .legend-dot { width: 12px; height: 12px; border-radius: 3px; }
+
         .date-input-group { display: flex; align-items: center; gap: 10px; }
         .date-input-group label { font-size: 0.8rem; color: var(--text-muted); }
         input[type="date"] {
@@ -169,14 +151,17 @@
             font-size: 1rem; font-weight: 600; margin-bottom: 20px;
             color: var(--text-color); display: flex; justify-content: space-between; align-items: center;
         }
+
         .add-link-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 25px; }
         .input-row { display: flex; gap: 8px; }
+        
         input[type="text"], input[type="url"] {
             background: var(--bg-color); border: 1px solid var(--border-color); 
             color: var(--text-color); padding: 8px 12px; border-radius: 6px; 
             flex: 1; outline: none; font-size: 0.85rem; transition: border-color 0.2s;
         }
         input:focus { border-color: #58a6ff; }
+
         button.btn-add {
             background: var(--accent-color); border: none; color: white;
             padding: 0 14px; border-radius: 6px; cursor: pointer; font-weight: 600;
@@ -188,6 +173,7 @@
             list-style: none; padding: 0; margin: 0; display: flex;
             flex-direction: column; gap: 8px; max-height: 500px; overflow-y: auto;
         }
+
         .links-list::-webkit-scrollbar { width: 6px; }
         .links-list::-webkit-scrollbar-track { background: transparent; }
         .links-list::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
@@ -195,16 +181,29 @@
         .link-item {
             display: flex; justify-content: space-between; align-items: center;
             background: var(--bg-color); padding: 10px 14px; border-radius: 6px;
-            border: 1px solid var(--border-color); transition: background 0.2s ease;
-            cursor: grab; position: relative; user-select: none;
+            border: 1px solid var(--border-color); transition: background 0.2s ease, transform 0.2s;
+            cursor: grab; /* Indicates Draggable */
+            position: relative; user-select: none;
         }
+        
         .link-item:active { cursor: grabbing; }
-        .link-item.dragging { opacity: 0.5; background: #21262d; border: 1px dashed #58a6ff; }
-        .link-item:hover { border-color: #8b949e; background: #21262d; }
+
+        .link-item.dragging {
+            opacity: 0.5;
+            background: #21262d;
+            border: 1px dashed #58a6ff;
+        }
+        
+        .link-item:hover {
+            border-color: #8b949e;
+            background: #21262d;
+        }
+
         .link-name { 
             font-weight: 600; font-size: 0.9rem; color: #58a6ff;
             white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 230px; 
         }
+
         .btn-delete {
             background: transparent; border: none; color: var(--text-muted);
             cursor: pointer; font-size: 1.2rem; padding: 0 4px;
@@ -217,27 +216,32 @@
             .container { flex-direction: column; align-items: center; gap: 40px; }
             .right-panel { width: 100%; min-width: auto; max-width: 500px; position: static; }
         }
+
     </style>
 </head>
 <body>
 
 <div class="container">
-    
-    <div class="sync-status" id="sync-status">
-        <div class="status-dot" id="status-dot"></div> <span id="status-text">Local</span>
-    </div>
-    <button class="settings-btn" onclick="openSettings()">⚙️</button>
 
     <div class="left-panel">
-        <h1 id="main-title">Deadline</h1>
+        <h1 id="main-title">Deadline Tracker</h1>
         <p class="subtitle" id="date-range-text">Loading...</p>
 
         <div class="stats-container">
-            <div class="stat-item"><span class="stat-label">Days Passed</span><span class="stat-value green" id="stat-passed">0</span></div>
+            <div class="stat-item">
+                <span class="stat-label">Days Passed</span>
+                <span class="stat-value green" id="stat-passed">0</span>
+            </div>
             <div style="width: 1px; background: #30363d; margin: 0 10px;"></div>
-            <div class="stat-item"><span class="stat-label">Days Left</span><span class="stat-value" id="stat-left">0</span></div>
+            <div class="stat-item">
+                <span class="stat-label">Days Left</span>
+                <span class="stat-value" id="stat-left">0</span>
+            </div>
             <div style="width: 1px; background: #30363d; margin: 0 10px;"></div>
-            <div class="stat-item"><span class="stat-label">Total Days</span><span class="stat-value" style="color: #8b949e" id="stat-total">0</span></div>
+            <div class="stat-item">
+                <span class="stat-label">Total Days</span>
+                <span class="stat-value" style="color: #8b949e" id="stat-total">0</span>
+            </div>
         </div>
 
         <div class="tracker-grid" id="grid"></div>
@@ -266,221 +270,60 @@
         </div>
         <ul class="links-list" id="links-list"></ul>
     </div>
-</div>
 
-<div class="modal-overlay" id="settings-modal">
-    <div class="modal">
-        <h2>Cloud Sync Setup</h2>
-        <p>To store data in your repo, create a GitHub Personal Access Token (PAT) with "Repo" scope.</p>
-        
-        <div class="form-group">
-            <label>GitHub Username</label>
-            <input type="text" id="gh-user" placeholder="e.g. tanmayshukla05">
-        </div>
-        <div class="form-group">
-            <label>Repository Name</label>
-            <input type="text" id="gh-repo" placeholder="e.g. deadline-tracker">
-        </div>
-        <div class="form-group">
-            <label>Personal Access Token</label>
-            <input type="password" id="gh-token" placeholder="ghp_xxxxxxxxxxxx">
-        </div>
-
-        <div class="modal-actions">
-            <button class="btn-cancel" onclick="closeSettings()">Close</button>
-            <button class="btn-save" onclick="saveSettings()">Connect & Sync</button>
-        </div>
-    </div>
 </div>
 
 <script>
     // ==========================================
-    // DATA LAYER (GitHub Sync vs Local)
+    // PART 1: TRACKER LOGIC
     // ==========================================
-    const DEFAULT_DATA = {
-        deadline: '2026-05-16',
-        links: [
-            { id: 1, name: "Google", url: "https://google.com" },
-            { id: 2, name: "GitHub", url: "https://github.com" }
-        ],
-        statuses: {}
-    };
-
-    let appData = JSON.parse(JSON.stringify(DEFAULT_DATA)); // Clone
-    let ghConfig = { user: '', repo: '', token: '' };
-    let fileSha = null; // Required for GitHub API updates
-
-    // --- 1. CONFIGURATION ---
-    function loadConfig() {
-        ghConfig.user = localStorage.getItem('gh_user') || '';
-        ghConfig.repo = localStorage.getItem('gh_repo') || '';
-        ghConfig.token = localStorage.getItem('gh_token') || '';
-        
-        if (ghConfig.token) {
-            updateStatus('loading', 'Fetching...');
-            fetchFromGitHub();
-        } else {
-            // Fallback to local storage if no cloud config
-            const local = localStorage.getItem('tracker_local_data');
-            if (local) appData = JSON.parse(local);
-            renderAll();
-        }
-    }
-
-    function openSettings() {
-        document.getElementById('gh-user').value = ghConfig.user;
-        document.getElementById('gh-repo').value = ghConfig.repo;
-        document.getElementById('gh-token').value = ghConfig.token;
-        document.getElementById('settings-modal').style.display = 'flex';
-    }
-
-    function closeSettings() {
-        document.getElementById('settings-modal').style.display = 'none';
-    }
-
-    function saveSettings() {
-        const user = document.getElementById('gh-user').value.trim();
-        const repo = document.getElementById('gh-repo').value.trim();
-        const token = document.getElementById('gh-token').value.trim();
-
-        if (user && repo && token) {
-            localStorage.setItem('gh_user', user);
-            localStorage.setItem('gh_repo', repo);
-            localStorage.setItem('gh_token', token);
-            ghConfig = { user, repo, token };
-            closeSettings();
-            updateStatus('loading', 'Connecting...');
-            fetchFromGitHub(); // Attempt connection
-        } else {
-            alert("Please fill all fields to enable sync.");
-        }
-    }
-
-    // --- 2. GITHUB API ---
-    const FILE_NAME = 'tracker_data.json';
-
-    async function fetchFromGitHub() {
-        const url = `https://api.github.com/repos/${ghConfig.user}/${ghConfig.repo}/contents/${FILE_NAME}`;
-        
-        try {
-            const response = await fetch(url, {
-                headers: { 'Authorization': `token ${ghConfig.token}` }
-            });
-
-            if (response.status === 404) {
-                // File doesn't exist yet, create it with current data
-                updateStatus('syncing', 'Creating File...');
-                await saveToGitHub();
-            } else if (response.ok) {
-                const data = await response.json();
-                fileSha = data.sha;
-                // Decode Base64 content
-                const content = decodeURIComponent(escape(atob(data.content)));
-                appData = JSON.parse(content);
-                renderAll();
-                updateStatus('saved', 'Synced');
-            } else {
-                throw new Error('Auth Error');
-            }
-        } catch (error) {
-            console.error(error);
-            updateStatus('error', 'Sync Failed');
-            // Fallback to local
-            const local = localStorage.getItem('tracker_local_data');
-            if(local) {
-                appData = JSON.parse(local);
-                renderAll();
-            }
-        }
-    }
-
-    async function saveToGitHub() {
-        // Always save to local storage as backup/instant cache
-        localStorage.setItem('tracker_local_data', JSON.stringify(appData));
-
-        if (!ghConfig.token) return; // No cloud config
-
-        updateStatus('syncing', 'Saving...');
-        
-        const url = `https://api.github.com/repos/${ghConfig.user}/${ghConfig.repo}/contents/${FILE_NAME}`;
-        const content = btoa(unescape(encodeURIComponent(JSON.stringify(appData, null, 2))));
-        
-        const body = {
-            message: "Update tracker data",
-            content: content
-        };
-        if (fileSha) body.sha = fileSha;
-
-        try {
-            const response = await fetch(url, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${ghConfig.token}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(body)
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                fileSha = data.content.sha;
-                updateStatus('saved', 'Saved');
-            } else {
-                updateStatus('error', 'Save Error');
-            }
-        } catch (e) {
-            updateStatus('error', 'Network Error');
-        }
-    }
-
-    function updateStatus(state, text) {
-        const dot = document.getElementById('status-dot');
-        const txt = document.getElementById('status-text');
-        
-        dot.className = 'status-dot ' + state;
-        txt.innerText = text;
-    }
-
-    // ==========================================
-    // UI RENDERING & LOGIC
-    // ==========================================
-    
-    // --- Render Orchestrator ---
-    function renderAll() {
-        document.getElementById('deadline-picker').value = appData.deadline;
-        generateTracker(appData.deadline);
-        renderLinks();
-    }
-
-    // --- Tracker Logic ---
     const START_DATE = new Date('2026-01-16T00:00:00');
+    const DEFAULT_END_DATE = '2026-05-16';
+    
     const gridContainer = document.getElementById('grid');
+    const dateRangeText = document.getElementById('date-range-text');
+    const deadlinePicker = document.getElementById('deadline-picker');
     const statPassedEl = document.getElementById('stat-passed');
     const statLeftEl = document.getElementById('stat-left');
     const statTotalEl = document.getElementById('stat-total');
 
+    let dayStatuses = JSON.parse(localStorage.getItem('tracker_statuses')) || {};
+
     function normalizeDate(date) {
-        const d = new Date(date); d.setHours(0,0,0,0); return d;
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d;
+    }
+
+    function formatDateReadable(date) {
+        return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
     }
 
     function getDateKey(date) {
-        return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     function toggleDayStatus(dateKey, dotElement) {
-        const current = appData.statuses[dateKey];
-        appData.statuses[dateKey] = (current === 'wasted') ? 'utilized' : 'wasted';
-        
-        // Update UI immediately
-        applyDotStatus(dotElement, appData.statuses[dateKey]);
-        // Save
-        saveToGitHub();
+        const currentStatus = dayStatuses[dateKey];
+        if (currentStatus === 'wasted') {
+            dayStatuses[dateKey] = 'utilized';
+        } else {
+            dayStatuses[dateKey] = 'wasted';
+        }
+        localStorage.setItem('tracker_statuses', JSON.stringify(dayStatuses));
+        applyDotStatus(dotElement, dayStatuses[dateKey]);
     }
 
     function applyDotStatus(dot, status) {
         dot.classList.remove('wasted', 'filled');
-        if (status === 'wasted') dot.classList.add('wasted');
-        else dot.classList.add('filled');
+        if (status === 'wasted') {
+            dot.classList.add('wasted');
+        } else {
+            dot.classList.add('filled');
+        }
     }
 
     function generateTracker(targetDateString) {
@@ -492,8 +335,8 @@
         let currentDate = new Date(START_DATE);
         let dayCounter = 0;
 
-        // Stats
-        const msPerDay = 86400000;
+        dateRangeText.innerText = `${formatDateReadable(START_DATE)} — ${formatDateReadable(endDate)}`;
+        const msPerDay = 1000 * 60 * 60 * 24;
         const totalDuration = Math.round((endDate - startNorm) / msPerDay);
         let daysPassed = 0;
         if (today > startNorm) daysPassed = Math.round((today - startNorm) / msPerDay);
@@ -503,33 +346,42 @@
         statPassedEl.innerText = daysPassed;
         statLeftEl.innerText = totalDuration - daysPassed;
         statTotalEl.innerText = totalDuration;
-        document.getElementById('date-range-text').innerText = `${START_DATE.toLocaleDateString()} — ${endDate.toLocaleDateString()}`;
 
         while (currentDate <= endDate) {
             if (dayCounter % 7 === 0) {
-                const w = document.createElement('div');
-                w.className = 'week-label';
-                w.innerText = 'W' + ((dayCounter/7)+1);
-                gridContainer.appendChild(w);
+                const weekNum = (dayCounter / 7) + 1;
+                const weekLabel = document.createElement('div');
+                weekLabel.classList.add('week-label');
+                weekLabel.innerText = 'W' + weekNum;
+                gridContainer.appendChild(weekLabel);
             }
 
             const dot = document.createElement('div');
-            dot.className = 'dot';
-            const normalized = normalizeDate(currentDate);
-            const dateKey = getDateKey(normalized);
-            dot.setAttribute('data-date', currentDate.toLocaleDateString(undefined, {month:'short', day:'numeric'}));
+            dot.classList.add('dot');
+            const dateString = currentDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
+            dot.setAttribute('data-date', dateString);
+            const normalizedCurrent = normalizeDate(currentDate);
+            const dateKey = getDateKey(normalizedCurrent);
 
-            if (normalized < today) {
+            // UPDATED LOGIC:
+            // 1. Strictly Passed Days: Clickable, Status Logic
+            if (normalizedCurrent < today) {
                 dot.classList.add('interactive');
                 dot.onclick = () => toggleDayStatus(dateKey, dot);
                 
-                const status = appData.statuses[dateKey];
-                if (status) applyDotStatus(dot, status);
-                else dot.classList.add('filled'); // Default green
+                const storedStatus = dayStatuses[dateKey];
+                if (storedStatus) {
+                    applyDotStatus(dot, storedStatus);
+                } else {
+                    dot.classList.add('filled'); // Default Utilized
+                }
             } 
-            else if (normalized.getTime() === today.getTime()) {
+            // 2. Today: Visual only, NOT clickable
+            else if (normalizedCurrent.getTime() === today.getTime()) {
                 dot.classList.add('today');
+                // No onClick event here
             }
+            // 3. Future: Empty
 
             gridContainer.appendChild(dot);
             currentDate.setDate(currentDate.getDate() + 1);
@@ -537,95 +389,137 @@
         }
     }
 
-    // --- Links Logic ---
+    const savedDate = localStorage.getItem('tracker_deadline');
+    const initialDate = savedDate || DEFAULT_END_DATE;
+    deadlinePicker.value = initialDate;
+    deadlinePicker.min = '2026-01-17';
+    generateTracker(initialDate);
+
+    deadlinePicker.addEventListener('change', (e) => {
+        if(e.target.value) {
+            generateTracker(e.target.value);
+            localStorage.setItem('tracker_deadline', e.target.value);
+        }
+    });
+
+    // ==========================================
+    // PART 2: LINKS MANAGER LOGIC (With Drag & Drop)
+    // ==========================================
+    const linkNameInput = document.getElementById('link-name');
+    const linkUrlInput = document.getElementById('link-url');
+    const addLinkBtn = document.getElementById('btn-add-link');
     const linksListEl = document.getElementById('links-list');
-    
+
+    const defaultLinks = [
+        { id: 1, name: "Google", url: "https://google.com" },
+        { id: 2, name: "GitHub", url: "https://github.com" }
+    ];
+
+    let myLinks = JSON.parse(localStorage.getItem('tracker_links')) || defaultLinks;
+
     function renderLinks() {
         linksListEl.innerHTML = '';
-        appData.links.forEach(link => {
+        myLinks.forEach(link => {
             const li = document.createElement('li');
-            li.className = 'link-item';
-            li.draggable = true;
-            li.dataset.id = link.id;
-            
-            li.onclick = (e) => {
-                if (!li.classList.contains('dragging')) window.open(link.url, '_blank');
-            };
+            li.classList.add('link-item');
+            li.setAttribute('draggable', 'true'); // Enable Drag
+            li.setAttribute('data-id', link.id);  // Identify link
 
-            li.innerHTML = `<span class="link-name">${link.name}</span><button class="btn-delete" onclick="event.stopPropagation(); deleteLink(${link.id})">&times;</button>`;
+            // Click to Open
+            li.onclick = (e) => {
+                // Prevent click if we were dragging (simple heuristic)
+                if (li.classList.contains('dragging')) return;
+                window.open(link.url, '_blank');
+            };
             
-            // Drag Events
-            li.addEventListener('dragstart', () => li.classList.add('dragging'));
+            li.innerHTML = `
+                <span class="link-name">${link.name}</span>
+                <button class="btn-delete" onclick="event.stopPropagation(); deleteLink(${link.id})">&times;</button>
+            `;
+
+            // --- Drag & Drop Event Listeners ---
+            li.addEventListener('dragstart', () => {
+                li.classList.add('dragging');
+            });
+
             li.addEventListener('dragend', () => {
                 li.classList.remove('dragging');
-                saveLinkOrder();
+                saveOrder(); // Save new order after drag ends
             });
 
             linksListEl.appendChild(li);
         });
     }
 
-    // Drag Logic
+    // --- Container Drag Events ---
     linksListEl.addEventListener('dragover', (e) => {
-        e.preventDefault();
+        e.preventDefault(); // Necessary to allow dropping
         const afterElement = getDragAfterElement(linksListEl, e.clientY);
         const draggable = document.querySelector('.dragging');
-        if (afterElement == null) linksListEl.appendChild(draggable);
-        else linksListEl.insertBefore(draggable, afterElement);
-    });
-
-    function getDragAfterElement(container, y) {
-        const draggableElements = [...container.querySelectorAll('.link-item:not(.dragging)')];
-        return draggableElements.reduce((closest, child) => {
-            const box = child.getBoundingClientRect();
-            const offset = y - box.top - box.height / 2;
-            if (offset < 0 && offset > closest.offset) return { offset: offset, element: child };
-            else return closest;
-        }, { offset: Number.NEGATIVE_INFINITY }).element;
-    }
-
-    function saveLinkOrder() {
-        const newOrderIds = [...linksListEl.querySelectorAll('.link-item')].map(li => parseInt(li.dataset.id));
-        appData.links.sort((a, b) => newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id));
-        saveToGitHub();
-    }
-
-    function addLink() {
-        const nameInput = document.getElementById('link-name');
-        const urlInput = document.getElementById('link-url');
-        const name = nameInput.value.trim();
-        let url = urlInput.value.trim();
-        
-        if (!name || !url) return alert("Enter name and URL");
-        if (!url.startsWith('http')) url = 'https://' + url;
-        
-        appData.links.push({ id: Date.now(), name, url });
-        saveToGitHub();
-        renderLinks();
-        nameInput.value = ''; urlInput.value = '';
-    }
-
-    window.deleteLink = function(id) {
-        appData.links = appData.links.filter(l => l.id !== id);
-        saveToGitHub();
-        renderLinks();
-    };
-
-    // --- Events ---
-    document.getElementById('deadline-picker').addEventListener('change', (e) => {
-        if(e.target.value) {
-            appData.deadline = e.target.value;
-            saveToGitHub();
-            renderAll();
+        if (afterElement == null) {
+            linksListEl.appendChild(draggable);
+        } else {
+            linksListEl.insertBefore(draggable, afterElement);
         }
     });
 
-    document.getElementById('btn-add-link').addEventListener('click', addLink);
-    document.getElementById('link-url').addEventListener('keypress', (e) => { if (e.key === 'Enter') addLink(); });
+    // Helper to determine where to place the dragged element
+    function getDragAfterElement(container, y) {
+        const draggableElements = [...container.querySelectorAll('.link-item:not(.dragging)')];
 
-    // Initial Load
-    loadConfig();
+        return draggableElements.reduce((closest, child) => {
+            const box = child.getBoundingClientRect();
+            const offset = y - box.top - box.height / 2;
+            if (offset < 0 && offset > closest.offset) {
+                return { offset: offset, element: child };
+            } else {
+                return closest;
+            }
+        }, { offset: Number.NEGATIVE_INFINITY }).element;
+    }
+
+    // Update Array Order based on DOM and Save
+    function saveOrder() {
+        const newOrderIds = [...linksListEl.querySelectorAll('.link-item')].map(li => parseInt(li.getAttribute('data-id')));
+        
+        // Re-sort myLinks array based on the DOM order
+        myLinks.sort((a, b) => {
+            return newOrderIds.indexOf(a.id) - newOrderIds.indexOf(b.id);
+        });
+        
+        saveAndRender(false); // Save, but don't re-render entire list (to avoid flicker)
+    }
+
+    function addLink() {
+        const name = linkNameInput.value.trim();
+        let url = linkUrlInput.value.trim();
+        if (!name || !url) return alert("Please enter both a name and a URL.");
+        if (!url.startsWith('http://') && !url.startsWith('https://')) url = 'https://' + url;
+        const newLink = { id: Date.now(), name: name, url: url };
+        myLinks.push(newLink);
+        saveAndRender();
+        linkNameInput.value = '';
+        linkUrlInput.value = '';
+    }
+
+    window.deleteLink = function(id) {
+        myLinks = myLinks.filter(link => link.id !== id);
+        saveAndRender();
+    };
+
+    function saveAndRender(shouldRender = true) {
+        localStorage.setItem('tracker_links', JSON.stringify(myLinks));
+        if (shouldRender) renderLinks();
+    }
+
+    addLinkBtn.addEventListener('click', addLink);
+    linkUrlInput.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') addLink();
+    });
+
+    renderLinks();
 
 </script>
+
 </body>
 </html>
